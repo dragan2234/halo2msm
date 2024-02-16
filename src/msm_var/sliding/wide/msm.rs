@@ -50,7 +50,7 @@ impl<F: PrimeField + Ord, App: CurveAffine<Base = F>> MSMHelper<F, App> for VarM
         points: &[Value<App>],
     ) -> Result<Vec<AssignedPoint<App>>, Error> {
         let table_size = 1 << self.window;
-        let mut running_aux = self.aux_generator.clone();
+        let mut running_aux = self.aux_generator;
         let points = points
             .iter()
             .map(|point| self.assign_point(ctx, point))

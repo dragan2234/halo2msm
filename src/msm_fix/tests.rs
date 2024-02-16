@@ -95,7 +95,7 @@ impl<F: PrimeField + Ord, App: CurveAffine<Base = F>> Circuit<F> for MyCircuit<F
             .enumerate()
             .map(|(point_idx, point)| {
                 let table = incremental_table(point, window_size, &aux.to_affine());
-                let cur_aux = aux.clone();
+                let cur_aux = aux;
                 aux = aux.double();
 
                 let _table = table

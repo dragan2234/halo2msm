@@ -254,7 +254,7 @@ impl<F: PrimeField + Ord, App: CurveAffine<Base = F>> MSMGate<F, App> for VarMSM
             decomposed
         });
         let decomposed = decomposed.transpose_vec(number_of_limbs);
-        let columns = vec![self.a0, self.a1, self.a2, self.a3, self.a4];
+        let columns = [self.a0, self.a1, self.a2, self.a3, self.a4];
         let zero = self.get_constant(ctx, F::ZERO)?;
         let mut assigned = vec![];
         for (_, chunk) in decomposed.chunks(NUMBER_OF_COLUMNS).enumerate() {

@@ -59,7 +59,7 @@ pub trait MSMGate<F: PrimeField + Ord, App: CurveAffine<Base = F>>: MSMHelper<F,
             for scalar in scalars.iter() {
                 acc = match &acc {
                     Some(acc) => {
-                        Some(self.read_add(ctx, &scalar[round], F::from(offset as u64), &acc)?)
+                        Some(self.read_add(ctx, &scalar[round], F::from(offset as u64), acc)?)
                     }
                     None => {
                         assert!(offset == 0 && round == 0);
@@ -86,8 +86,8 @@ pub trait MSMGate<F: PrimeField + Ord, App: CurveAffine<Base = F>>: MSMHelper<F,
         point: &App,
     ) -> Result<AssignedPoint<App>, Error> {
         let coordianates = point.coordinates().unwrap();
-        let x = coordianates.x().clone();
-        let y = coordianates.y().clone();
+        let x = *coordianates.x();
+        let y = *coordianates.y();
         let x = self.get_constant(ctx, x)?;
         let y = self.get_constant(ctx, y)?;
         Ok(AssignedPoint::new(x, y))
