@@ -12,6 +12,7 @@ halo2 = { package = "halo2_proofs", git = "https://github.com/privacy-scaling-ex
 halo2_common = { package = "halo2_common", git = "https://github.com/privacy-scaling-explorations/halo2" }
 halo2_middleware = { package = "halo2_middleware", git = "https://github.com/privacy-scaling-explorations/halo2" }
 # halo2 = { package = "halo2_proofs", path = "../halo2/halo2_proofs" }
+halo2curves = { git = "https://github.com/dragan2234/halo2curves", branch = "support_bls12-381" }
 group = "0.13"
 ff = "0.13"
 subtle = { version = "2.3", default-features = false }
