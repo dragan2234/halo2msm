@@ -16,7 +16,7 @@ impl<F: PrimeField + Ord, App: CurveAffine<Base = F>> MSMHelper<F, App>
         for (address, bucket) in buckets.iter().enumerate() {
             let address = F::from(address as u64);
             let address = self.get_constant(ctx, address)?;
-            self.write_point(ctx, &address, &bucket)?;
+            self.write_point(ctx, &address, bucket)?;
         }
         Ok(())
     }

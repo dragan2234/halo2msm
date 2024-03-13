@@ -14,8 +14,8 @@ impl<F: PrimeField + Ord, App: CurveAffine<Base = F>> FixMSMGate<F, App> {
         point: &App,
     ) -> Result<AssignedPoint<App>, Error> {
         let coordianates = point.coordinates().unwrap();
-        let x = coordianates.x().clone();
-        let y = coordianates.y().clone();
+        let x = *coordianates.x();
+        let y = *coordianates.y();
         let x = self.get_constant(ctx, x)?;
         let y = self.get_constant(ctx, y)?;
         Ok(AssignedPoint::new(x, y))
@@ -65,7 +65,7 @@ impl<F: PrimeField + Ord, App: CurveAffine<Base = F>> FixMSMGate<F, App> {
             let mut offset = 0;
             for (point_idx, scalar) in scalars.iter().enumerate() {
                 acc = match &acc {
-                    Some(acc) => Some(self.read_add(ctx, point_idx, &scalar[round], &acc)?),
+                    Some(acc) => Some(self.read_add(ctx, point_idx, &scalar[round], acc)?),
                     None => {
                         assert!(offset == 0 && round == 0);
                         Some(self.read_point(ctx, point_idx, &scalar[round])?)
@@ -116,7 +116,7 @@ impl<F: PrimeField + Ord, App: CurveAffine<Base = F>> FixMSMGate<F, App> {
         let (x, y) = point
             .map(|c| {
                 let coordinates = c.coordinates().unwrap();
-                (coordinates.x().clone(), coordinates.y().clone())
+                (*coordinates.x(), *coordinates.y())
             })
             .unzip();
         let x_square = x * x;
@@ -290,7 +290,7 @@ impl<F: PrimeField + Ord, App: CurveAffine<Base = F>> FixMSMGate<F, App> {
                     || "address",
                     self.address_table,
                     0,
-                    || Value::known(F::from((0) as u64)),
+                    || Value::known(F::from(0_u64)),
                 )?;
 
                 for (address, (_address, (x, y))) in self.memory.iter().enumerate() {

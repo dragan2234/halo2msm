@@ -5,9 +5,9 @@ use group::Curve;
 use halo2::{
     circuit::{AssignedCell, Cell, Region, Value},
     halo2curves::CurveAffine,
-    plonk::{Advice, Any, Column, Error, Fixed, Selector},
+    plonk::{Advice, Column, Error, Fixed, Selector},
 };
-
+use halo2_middleware::circuit::Any;
 macro_rules! e {
     // I just want not to see too much cloned expressions around :/ this is a bit less ugly
     ($a:expr) => {
@@ -19,8 +19,8 @@ macro_rules! div_ceil {
         (($a - 1) / $b) + 1
     };
 }
-pub mod msm_var;
 pub mod msm_fix;
+pub mod msm_var;
 pub(crate) mod util;
 
 pub type AssignedValue<F> = AssignedCell<F, F>;
@@ -35,7 +35,7 @@ pub struct AssignedPoint<C: CurveAffine> {
 pub(crate) fn coords<C: CurveAffine>(point: Value<C>) -> Value<(C::Base, C::Base)> {
     point.map(|c| {
         let coordinates = c.coordinates().unwrap();
-        (coordinates.x().clone(), coordinates.y().clone())
+        (*coordinates.x(), *coordinates.y())
     })
 }
 

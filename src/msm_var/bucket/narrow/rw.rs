@@ -22,17 +22,17 @@ impl<F: PrimeField + Ord> Query<F> {
     pub(crate) fn read(address: &Value<F>, x: &Value<F>, y: &Value<F>) -> Self {
         Self {
             is_read: true,
-            address: address.clone(),
-            x: x.clone(),
-            y: y.clone(),
+            address: *address,
+            x: *x,
+            y: *y,
         }
     }
     pub(crate) fn write(address: &Value<F>, x: &Value<F>, y: &Value<F>) -> Self {
         Self {
             is_read: false,
-            address: address.clone(),
-            x: x.clone(),
-            y: y.clone(),
+            address: *address,
+            x: *x,
+            y: *y,
         }
     }
 }
@@ -54,16 +54,16 @@ impl<F: PrimeField + Ord> Memory<F> {
             *value
         });
         let (x, y) = coords.unzip();
-        let query = Query::read(&address, &x, &y);
+        let query = Query::read(address, &x, &y);
         self.add_query(&query);
         x.zip(y).map(|(x, y)| C::from_xy(x, y).unwrap())
     }
     pub(crate) fn write(&mut self, address: &Value<F>, coords: &Value<(F, F)>) {
-        address.zip(coords.clone()).map(|(address, coords)| {
+        address.zip(*coords).map(|(address, coords)| {
             self.state.insert(address, coords);
         });
         let (x, y) = coords.unzip();
-        let query = Query::write(&address, &x, &y);
+        let query = Query::write(address, &x, &y);
         self.add_query(&query);
     }
     pub(crate) fn add_query(&mut self, query: &Query<F>) {

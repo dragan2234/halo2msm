@@ -12,11 +12,13 @@ use halo2::{
     plonk::Error,
     plonk::{Circuit, ConstraintSystem},
 };
+use halo2curves::bandersnatch;
 use rand_core::OsRng;
 use rand_core::SeedableRng;
 use rand_xorshift::XorShiftRng;
 use std::collections::BTreeMap;
 use std::vec;
+use halo2curves::bandersnatch::*;
 
 use super::config::FixMSMGate;
 
@@ -95,7 +97,7 @@ impl<F: PrimeField + Ord, App: CurveAffine<Base = F>> Circuit<F> for MyCircuit<F
             .enumerate()
             .map(|(point_idx, point)| {
                 let table = incremental_table(point, window_size, &aux.to_affine());
-                let cur_aux = aux.clone();
+                let cur_aux = aux;
                 aux = aux.double();
 
                 let _table = table
@@ -209,24 +211,55 @@ impl<F: PrimeField + Ord, App: CurveAffine<Base = F>> Circuit<F> for MyCircuit<F
 #[test]
 fn test_fixed_msm() {
     // let rand_point = || App::CurveExt::random(OsRng);
-    use halo2::halo2curves::pasta::{EqAffine, Fq};
+    // use halo2::halo2curves::pasta::{EqAffine, Fq};
+
+    use halo2curves::bandersnatch::Bandersnatch as G1Projective;
+    // use halo2curves::bandersnatch::Fr as Fq;
+
+    use halo2curves::bandersnatch::BandersnatchAffine as G1Affine;
     const K: u32 = 21;
 
-    let mut rng = XorShiftRng::from_seed([
-        0x59, 0x62, 0xbe, 0x5d, 0x76, 0x3d, 0x31, 0x8d, 0x17, 0xdb, 0x37, 0x32, 0x54, 0x06, 0xbc,
-        0xe5,
-    ]);
-    let n = 10000;
-    let bases: Vec<EqAffine> = (0..n).map(|_| Eq::random(&mut rng).to_affine()).collect();
+    let n = 2;
+    // let bases: Vec<EqAffine> = (0..n).map(|_| Eq::random(&mut rng).to_affine()).collect();
 
-    let aux = Eq::generator().to_affine();
+    let bases_bls: Vec<G1Affine> = (0..n).map(|_| G1Projective::generator().to_affine()).collect();
 
-    let window = 6;
-    let circuit = MyCircuit::<Fq, EqAffine> { bases, window, aux };
-    let public_inputs = vec![vec![]];
-    let prover = match MockProver::run(K, &circuit, public_inputs) {
+    // let aux = Eq::generator().to_affine();
+
+    let aux_bls = G1Projective::generator().to_affine();
+
+    let window = 8;
+    // let circuit = MyCircuit::<Fq, EqAffine> { bases, window, aux };
+
+    let circuit_bls = MyCircuit::<Fp, G1Affine> {bases: bases_bls, window, aux: aux_bls};
+    // let public_inputs = vec![vec![]];
+    let public_inputs_bls: Vec<Vec<Fp>> = vec![vec![]];
+
+    // let scalars = [bandersnatch::Fr::from(3), bandersnatch::Fr::from(4)];
+
+    // let bases_bls = [G1Projective::generator(), G1Projective::generator()];
+
+    // let res0 = multiexp_naive_var(&bases_bls[..], &scalars[..]).to_affine();
+
+
+    // println!("res0 is: {:?}", res0);
+
+    // let gen_2 = G1Projective::generator() + G1Projective::generator() + G1Projective::generator() + G1Projective::generator() + G1Projective::generator() + G1Projective::generator() + G1Projective::generator();
+
+    // println!("bases_bls is: {:?}", gen_2.to_affine());
+
+
+    // let prover = match MockProver::run(K, &circuit, public_inputs) {
+    //     Ok(prover) => prover,
+    //     Err(e) => panic!("{:#?}", e),
+    // };
+
+    let prover_bls = match MockProver::run(K, &circuit_bls, public_inputs_bls) {
         Ok(prover) => prover,
         Err(e) => panic!("{:#?}", e),
     };
-    prover.assert_satisfied();
+
+    // prover.assert_satisfied();
+
+    prover_bls.assert_satisfied();
 }

@@ -51,7 +51,7 @@ impl<F: PrimeField + Ord, App: CurveAffine<Base = F>> MSMGate<F, App> for VarMSM
         let (x, y) = point
             .map(|c| {
                 let coordinates = c.coordinates().unwrap();
-                (coordinates.x().clone(), coordinates.y().clone())
+                (*coordinates.x(), *coordinates.y())
             })
             .unzip();
         let x_square = x * x;

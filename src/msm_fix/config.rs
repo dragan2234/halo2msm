@@ -3,12 +3,11 @@ use crate::AssignedValue;
 use ff::PrimeField;
 use halo2::{
     halo2curves::CurveAffine,
-    plonk::{
-        Advice, Column, ConstraintSystem, Constraints, Expression, Fixed, Selector, TableColumn,
-    },
+    plonk::{Advice, Column, ConstraintSystem, Expression, Fixed, Selector, TableColumn},
     poly::Rotation,
 };
-use std::{collections::BTreeMap, marker::PhantomData, slice::Windows};
+use halo2_common::plonk::Constraints;
+use std::{collections::BTreeMap, marker::PhantomData};
 
 #[derive(Clone, Debug)]
 pub struct FixMSMGate<F: PrimeField + Ord, App: CurveAffine<Base = F>> {
