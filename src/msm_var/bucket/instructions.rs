@@ -76,7 +76,7 @@ pub trait MSMGate<F: PrimeField + Ord, App: CurveAffine<Base = F>>: MSMHelper<F,
             };
         }
         let correction_point = self.correction_point(ctx)?;
-        Ok(self.add(ctx, &acc.unwrap(), &correction_point)?)
+        self.add(ctx, &acc.unwrap(), &correction_point)
     }
     fn advice_columns(&self) -> Vec<Column<Advice>>;
     fn fixed_colmns(&self) -> Vec<Column<Fixed>>;
@@ -91,8 +91,8 @@ pub trait MSMGate<F: PrimeField + Ord, App: CurveAffine<Base = F>>: MSMHelper<F,
         point: &App,
     ) -> Result<AssignedPoint<App>, Error> {
         let coordianates = point.coordinates().unwrap();
-        let x = coordianates.x().clone();
-        let y = coordianates.y().clone();
+        let x = *coordianates.x();
+        let y = *coordianates.y();
         let x = self.get_constant(ctx, x)?;
         let y = self.get_constant(ctx, y)?;
         Ok(AssignedPoint::new(x, y))

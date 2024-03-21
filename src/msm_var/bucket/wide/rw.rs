@@ -37,10 +37,9 @@ impl<F: PrimeField + Ord> Memory<F> {
         address: &Value<F>,
     ) -> Value<(C::Base, C::Base)> {
         address.map(|address| {
-            self.state
+            *self.state
                 .entry(address)
                 .or_insert_with(|| (F::ZERO, F::ZERO))
-                .clone()
         })
     }
     pub(crate) fn dummy_write(&mut self, address: &Value<F>) {
@@ -49,7 +48,7 @@ impl<F: PrimeField + Ord> Memory<F> {
     }
     pub(crate) fn write(&mut self, address: &Value<F>, coords_write: &Value<(F, F)>) {
         let coords_read = address
-            .zip(coords_write.clone())
+            .zip(*coords_write)
             .map(|(address, coords_write)| {
                 let coords_read = self.state.insert(address, coords_write);
                 match coords_read {
@@ -60,7 +59,7 @@ impl<F: PrimeField + Ord> Memory<F> {
         let (x0, y0) = coords_read.unzip();
         let (x1, y1) = coords_write.unzip();
         let query = Query {
-            address: address.clone(),
+            address: *address,
             x0,
             y0,
             x1,
